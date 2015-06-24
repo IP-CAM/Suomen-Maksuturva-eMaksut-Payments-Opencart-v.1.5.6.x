@@ -37,55 +37,55 @@ class ControllerPaymentEmaksut extends Controller {
 			$this->redirect(HTTPS_SERVER . 'index.php?route=extension/payment&token=' . $this->session->data['token']);
 		}
 
-		$data['heading_title'] = $this->language->get('heading_title');
+		$this->data['heading_title'] = $this->language->get('heading_title');
 
-		$data['text_enabled'] = $this->language->get('text_enabled');
-		$data['text_disabled'] = $this->language->get('text_disabled');
-		$data['text_all_zones'] = $this->language->get('text_all_zones');
-		$data['text_yes'] = $this->language->get('text_yes');
-		$data['text_no'] = $this->language->get('text_no');
-		$data['text_successful'] = $this->language->get('text_successful');
-		$data['text_declined'] = $this->language->get('text_declined');
-		$data['text_off'] = $this->language->get('text_off');
+		$this->data['text_enabled'] = $this->language->get('text_enabled');
+		$this->data['text_disabled'] = $this->language->get('text_disabled');
+		$this->data['text_all_zones'] = $this->language->get('text_all_zones');
+		$this->data['text_yes'] = $this->language->get('text_yes');
+		$this->data['text_no'] = $this->language->get('text_no');
+		$this->data['text_successful'] = $this->language->get('text_successful');
+		$this->data['text_declined'] = $this->language->get('text_declined');
+		$this->data['text_off'] = $this->language->get('text_off');
 
-		$data['entry_sellerid'] = $this->language->get('entry_sellerid');
-		$data['entry_sellerkey'] = $this->language->get('entry_sellerkey');
-		$data['entry_sellerkeyver'] = $this->language->get('entry_sellerkeyver');
+		$this->data['entry_sellerid'] = $this->language->get('entry_sellerid');
+		$this->data['entry_sellerkey'] = $this->language->get('entry_sellerkey');
+		$this->data['entry_sellerkeyver'] = $this->language->get('entry_sellerkeyver');
 
-		$data['entry_test'] = $this->language->get('entry_test');
-		$data['entry_order_status'] = $this->language->get('entry_order_status');
-		$data['entry_order_status_delayed'] = $this->language->get('entry_order_status_delayed');
-		$data['entry_geo_zone'] = $this->language->get('entry_geo_zone');
-		$data['entry_status'] = $this->language->get('entry_status');
-		$data['entry_sort_order'] = $this->language->get('entry_sort_order');
+		$this->data['entry_test'] = $this->language->get('entry_test');
+		$this->data['entry_order_status'] = $this->language->get('entry_order_status');
+		$this->data['entry_order_status_delayed'] = $this->language->get('entry_order_status_delayed');
+		$this->data['entry_geo_zone'] = $this->language->get('entry_geo_zone');
+		$this->data['entry_status'] = $this->language->get('entry_status');
+		$this->data['entry_sort_order'] = $this->language->get('entry_sort_order');
 
-		$data['button_save'] = $this->language->get('button_save');
-		$data['button_cancel'] = $this->language->get('button_cancel');
+		$this->data['button_save'] = $this->language->get('button_save');
+		$this->data['button_cancel'] = $this->language->get('button_cancel');
 
-		$data['tab_general'] = $this->language->get('tab_general');
+		$this->data['tab_general'] = $this->language->get('tab_general');
 
 		if (isset($this->error['warning'])) {
-			$data['error_warning'] = $this->error['warning'];
+			$this->data['error_warning'] = $this->error['warning'];
 		} else {
-			$data['error_warning'] = '';
+			$this->data['error_warning'] = '';
 		}
 
 		if (isset($this->error['sellerid'])) {
-			$data['error_sellerid'] = $this->error['sellerid'];
+			$this->data['error_sellerid'] = $this->error['sellerid'];
 		} else {
-			$data['error_sellerid'] = '';
+			$this->data['error_sellerid'] = '';
 		}
 
 		if (isset($this->error['sellerkey'])) {
-			$data['error_sellerkey'] = $this->error['sellerkey'];
+			$this->data['error_sellerkey'] = $this->error['sellerkey'];
 		} else {
-			$data['error_sellerkey'] = '';
+			$this->data['error_sellerkey'] = '';
 		}
 
 		if (isset($this->error['sellerkeyver'])) {
-			$data['error_sellerkeyver'] = $this->error['sellerkeyver'];
+			$this->data['error_sellerkeyver'] = $this->error['sellerkeyver'];
 		} else {
-			$data['error_sellerkeyver'] = '';
+			$this->data['error_sellerkeyver'] = '';
 		}
 
 		$this->document->breadcrumbs = array();
@@ -108,70 +108,70 @@ class ControllerPaymentEmaksut extends Controller {
 			'separator' => ' :: '
 		);
 
-		$data['action'] = HTTPS_SERVER . 'index.php?route=payment/emaksut&token=' . $this->session->data['token'];
+		$this->data['action'] = HTTPS_SERVER . 'index.php?route=payment/emaksut&token=' . $this->session->data['token'];
 
-		$data['cancel'] = HTTPS_SERVER . 'index.php?route=extension/payment&token=' . $this->session->data['token'];
+		$this->data['cancel'] = HTTPS_SERVER . 'index.php?route=extension/payment&token=' . $this->session->data['token'];
 
 		if (isset($this->request->post['emaksut_sellerid'])) {
-			$data['emaksut_sellerid'] = $this->request->post['emaksut_sellerid'];
+			$this->data['emaksut_sellerid'] = $this->request->post['emaksut_sellerid'];
 		} else {
-			$data['emaksut_sellerid'] = $this->config->get('emaksut_sellerid');
+			$this->data['emaksut_sellerid'] = $this->config->get('emaksut_sellerid');
 		}
 
 		if (isset($this->request->post['emaksut_sellerkey'])) {
-			$data['emaksut_sellerkey'] = $this->request->post['emaksut_sellerkey'];
+			$this->data['emaksut_sellerkey'] = $this->request->post['emaksut_sellerkey'];
 		} else {
-			$data['emaksut_sellerkey'] = $this->config->get('emaksut_sellerkey');
+			$this->data['emaksut_sellerkey'] = $this->config->get('emaksut_sellerkey');
 		}
 
 		if (isset($this->request->post['emaksut_sellerkeyver'])) {
-			$data['emaksut_sellerkeyver'] = $this->request->post['emaksut_sellerkeyver'];
+			$this->data['emaksut_sellerkeyver'] = $this->request->post['emaksut_sellerkeyver'];
 		} else {
-			$data['emaksut_sellerkeyver'] = $this->config->get('emaksut_sellerkeyver');
+			$this->data['emaksut_sellerkeyver'] = $this->config->get('emaksut_sellerkeyver');
 		}
 
 		if (isset($this->request->post['emaksut_test'])) {
-			$data['emaksut_test'] = $this->request->post['emaksut_test'];
+			$this->data['emaksut_test'] = $this->request->post['emaksut_test'];
 		} else {
-			$data['emaksut_test'] = $this->config->get('emaksut_test');
+			$this->data['emaksut_test'] = $this->config->get('emaksut_test');
 		}
 
 		if (isset($this->request->post['emaksut_order_status_id'])) {
-			$data['emaksut_order_status_id'] = $this->request->post['emaksut_order_status_id'];
+			$this->data['emaksut_order_status_id'] = $this->request->post['emaksut_order_status_id'];
 		} else {
-			$data['emaksut_order_status_id'] = $this->config->get('emaksut_order_status_id');
+			$this->data['emaksut_order_status_id'] = $this->config->get('emaksut_order_status_id');
 		}
 
 		if (isset($this->request->post['emaksut_order_status_delayed_id'])) {
-			$data['emaksut_order_status_delayed_id'] = $this->request->post['emaksut_order_status_delayed_id'];
+			$this->data['emaksut_order_status_delayed_id'] = $this->request->post['emaksut_order_status_delayed_id'];
 		} else {
-			$data['emaksut_order_status_delayed_id'] = $this->config->get('emaksut_order_status_delayed_id');
+			$this->data['emaksut_order_status_delayed_id'] = $this->config->get('emaksut_order_status_delayed_id');
 		}
 
 		$this->load->model('localisation/order_status');
 
-		$data['order_statuses'] = $this->model_localisation_order_status->getOrderStatuses();
+		$this->data['order_statuses'] = $this->model_localisation_order_status->getOrderStatuses();
 
 		if (isset($this->request->post['emaksut_geo_zone_id'])) {
-			$data['emaksut_geo_zone_id'] = $this->request->post['emaksut_geo_zone_id'];
+			$this->data['emaksut_geo_zone_id'] = $this->request->post['emaksut_geo_zone_id'];
 		} else {
-			$data['emaksut_geo_zone_id'] = $this->config->get('emaksut_geo_zone_id');
+			$this->data['emaksut_geo_zone_id'] = $this->config->get('emaksut_geo_zone_id');
 		}
 
 		$this->load->model('localisation/geo_zone');
 
-		$data['geo_zones'] = $this->model_localisation_geo_zone->getGeoZones();
+		$this->data['geo_zones'] = $this->model_localisation_geo_zone->getGeoZones();
 
 		if (isset($this->request->post['emaksut_status'])) {
-			$data['emaksut_status'] = $this->request->post['emaksut_status'];
+			$this->data['emaksut_status'] = $this->request->post['emaksut_status'];
 		} else {
-			$data['emaksut_status'] = $this->config->get('emaksut_status');
+			$this->data['emaksut_status'] = $this->config->get('emaksut_status');
 		}
 
 		if (isset($this->request->post['emaksut_sort_order'])) {
-			$data['emaksut_sort_order'] = $this->request->post['emaksut_sort_order'];
+			$this->data['emaksut_sort_order'] = $this->request->post['emaksut_sort_order'];
 		} else {
-			$data['emaksut_sort_order'] = $this->config->get('emaksut_sort_order');
+			$this->data['emaksut_sort_order'] = $this->config->get('emaksut_sort_order');
 		}
 
 		$this->id       = 'content';
