@@ -1,7 +1,7 @@
 <?php
 // Text
-$_['text_title'] = 'eMaksut';
-$_['heading_title'] = 'eMaksut maksu';
+$_['text_title'] = 'eMaksut / Verkkomaksu / Korttimaksu / Osamaksu / Lasku';
+$_['heading_title'] = 'Suomen Maksuturva / eMaksut';
 $_['text_response'] = 'Tieto maksusta välitetty verkkokaupalle.';
 $_['text_success'] = 'Maksu onnistui.';
 $_['text_success_wait'] = '<b><span style="color: #FF0000">Odota hetki...</span></b>Käsittelemme maksua.<br><a href="%s">Napsauta tästä mikäli selaimesi ei uudelleen ohjaudu automaattisesti 10 sekunnissa</a>.';

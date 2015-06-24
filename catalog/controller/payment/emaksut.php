@@ -29,7 +29,7 @@ class ControllerPaymentEmaksut extends Controller {
 		$this->load->model('checkout/order');
 
 		$order_info = $this->model_checkout_order->getOrder($this->session->data['order_id']);
-
+		
 		$this->data['action'] = 'https://www.maksuturva.fi/NewPaymentExtended.pmt';
 
 		function viitetarkiste($viite) {
@@ -44,7 +44,7 @@ class ControllerPaymentEmaksut extends Controller {
 
 		$this->data['order_info'] = $order_info;
 		$this->data['cart'] = $this->cart;
-
+		
 		// Toiminnon tunniste (aina NEW_PAYMENT_EXTENDED)
 		$this->data['pmt_action'] = 'NEW_PAYMENT_EXTENDED';
 
@@ -119,7 +119,7 @@ class ControllerPaymentEmaksut extends Controller {
 			// Tilausrivin toimituksen tai palvelun suorituksen ajankohta
 			$this->data['pmt_row_deliverydate' . $count] = date('d.m.Y');
 			// Tilausrivin tuotteen bruttohinta per yksikkö (ALV mukana)
-			$unitPrice = $this->tax->calculate($product['price'], $product['tax_class_id'], true);
+			$unitPrice = $product['price'];
 			if ($product['quantity'] > 0) {
 				$amount += $unitPrice * $product['quantity'];
 			}
@@ -127,15 +127,13 @@ class ControllerPaymentEmaksut extends Controller {
 			// Tilausrivin tuotteen nettohinta per yksikkö (ilman ALV:a)
 			//$this->data['pmt_row_price_net' . $count] = number_format(round($product['price'], 2), 2, ',', '');
 			// Tilausrivin tuotteeseen sovellettu ALV-prosentti
-			$this->data['pmt_row_vat' . $count] = number_format($this->tax->getRate($product['tax_class_id']), 2, ',', '');
+			$this->data['pmt_row_vat' . $count] = $this->data['tax_class_id'] = 1;
 			// Tilausrivin alennusprosentti
 			$this->data['pmt_row_discountpercentage' . $count] = '0,00';
 			// Tilausrivin tyyppi (1 = tuote 2 = postikulu 3 = käsittelykulu 4 = räätälöity tuote (ei palautusoikeutta) 5 = palvelu 6 = alennus (rahamäärä))
 			$this->data['pmt_row_type' . $count] = 1;
 			$count++;
 		}
-
-		$this->data['pmt_amount'] = number_format(round($amount, 2), 2, ',', '');
 
 		if ($this->session->data['shipping_method']['cost']) {
 			$this->data['pmt_rows']++;
@@ -149,11 +147,11 @@ class ControllerPaymentEmaksut extends Controller {
 			// Tilausrivin toimituksen tai palvelun suorituksen ajankohta
 			$this->data['pmt_row_deliverydate' . $count] = date('d.m.Y');
 			// Tilausrivin tuotteen bruttohinta per yksikkö (ALV mukana)
-			$this->data['pmt_row_price_gross' . $count] = number_format($this->tax->calculate($this->session->data['shipping_method']['cost'], $this->session->data['shipping_method']['tax_class_id'], true), 2, ',', '');
+			$this->data['pmt_row_price_gross' . $count] = $this->session->data['shipping_method']['cost'];
 			// Tilausrivin tuotteen nettohinta per yksikkö (ilman ALV:a)
 			//$this->data['pmt_row_price_net' . $count] = number_format(round($this->session->data['shipping_method']['cost'], 2), 2, ',', '');
 			// Tilausrivin tuotteeseen sovellettu ALV-prosentti
-			$this->data['pmt_row_vat' . $count] = number_format($this->tax->getRate($this->session->data['shipping_method']['tax_class_id']), 2, ',', '');
+			$this->data['pmt_row_vat' . $count] = $this->data['tax_class_id'] = 1;
 			// Tilausrivin alennusprosentti
 			$this->data['pmt_row_discountpercentage' . $count] = '0,00';
 			// Tilausrivin tyyppi (1 = tuote 2 = postikulu 3 = käsittelykulu 4 = räätälöity tuote (ei palautusoikeutta) 5 = palvelu 6 = alennus (rahamäärä))
@@ -161,8 +159,83 @@ class ControllerPaymentEmaksut extends Controller {
 
 			// Myyjän / toimittajan käsittelykulut (n,nn)
 			$this->data['pmt_sellercosts'] = $this->data['pmt_row_price_gross' . $count];
+			
+			$count++;
 		}
+		// Coupon or Voucher
+			$total_data = array();
+			$total = 0;
+			$taxes = $this->cart->getTaxes();
+			
+			$this->load->model('setting/extension');
 
+			$sort_order = array(); 
+
+			$results = $this->model_setting_extension->getExtensions('total');
+			
+			foreach ($results as $key => $value) {
+				$sort_order[$key] = $this->config->get($value['code'] . '_sort_order');
+			}
+			array_multisort($sort_order, SORT_ASC, $results);
+			
+			foreach ($results as $result) {
+				if ($this->config->get($result['code'] . '_status')) {
+					$this->load->model('total/' . $result['code']);
+
+					$this->{'model_total_' . $result['code']}->getTotal($total_data, $total, $taxes);
+				}
+			}
+		 foreach($total_data as $item){
+			 if($item['code'] == 'tax'){
+				 $this->data['pmt_rows']++;
+				// Tilausrivin tuotteen nimi
+				$this->data['pmt_row_name' . $count] = $item['code'];
+				// Tilausrivin tuotteen kuvaus
+				$this->data['pmt_row_desc' . $count] = $item['title'];
+				// Tilausrivin tuotteen määrä
+				$this->data['pmt_row_quantity' . $count] = 1;
+				// Tilausrivin toimituksen tai palvelun suorituksen ajankohta
+				$this->data['pmt_row_deliverydate' . $count] = date('d.m.Y');
+				// Tilausrivin tuotteen bruttohinta per yksikkö (ALV mukana)
+				$price = round($item['value'], 3);
+				$amount += $price;
+				$this->data['pmt_row_price_gross' . $count] = $price;
+				// Tilausrivin tuotteeseen sovellettu ALV-prosentti
+				$this->data['pmt_row_vat' . $count] = $this->data['tax_class_id'] = 1;
+				// Tilausrivin alennusprosentti
+				$this->data['pmt_row_discountpercentage' . $count] = '0,00';
+				// Tilausrivin tyyppi (1 = tuote 2 = postikulu 3 = käsittelykulu 4 = räätälöity tuote (ei palautusoikeutta) 5 = palvelu 6 = alennus (rahamäärä))
+				$this->data['pmt_row_type' . $count] = 1;
+				$count++;
+			 }
+			 
+			 if($item['code'] == 'coupon' || $item['code'] == 'voucher'){
+				 $this->data['pmt_rows']++;
+				// Tilausrivin tuotteen nimi
+				$this->data['pmt_row_name' . $count] = $item['code'];
+				// Tilausrivin tuotteen kuvaus
+				$this->data['pmt_row_desc' . $count] = $item['title'];
+				// Tilausrivin tuotteen määrä
+				$this->data['pmt_row_quantity' . $count] = 1;
+				// Tilausrivin toimituksen tai palvelun suorituksen ajankohta
+				$this->data['pmt_row_deliverydate' . $count] = date('d.m.Y');
+				// Tilausrivin tuotteen bruttohinta per yksikkö (ALV mukana)
+				$price = round($item['value'], 3);
+				$amount += $price;
+				$this->data['pmt_row_price_gross' . $count] = $price;
+				// Tilausrivin tuotteeseen sovellettu ALV-prosentti
+				$this->data['pmt_row_vat' . $count] = $this->data['tax_class_id'] = 1;
+				// Tilausrivin alennusprosentti
+				$this->data['pmt_row_discountpercentage' . $count] = '0,00';
+				// Tilausrivin tyyppi (1 = tuote 2 = postikulu 3 = käsittelykulu 4 = räätälöity tuote (ei palautusoikeutta) 5 = palvelu 6 = alennus (rahamäärä))
+				$this->data['pmt_row_type' . $count] = 6;
+				$count++;
+			 }
+		 }
+		//end Coupon or Voucher
+		
+		$this->data['pmt_amount'] = number_format(round($amount, 2), 2, ',', '');
+		
 		// Tarkisteen laskentamerkistö
 		$this->data['pmt_charset'] = 'UTF-8';
 		// Sisään tulevan datan enkoodaus (ja verkkokaupan enkoodaus selaimen suuntaan)
@@ -174,7 +247,7 @@ class ControllerPaymentEmaksut extends Controller {
 		if($this->config->get('emaksut_test')=='1') {
 			$this->data['pmt_sellerid'] = 'testikauppias';
 			$sellerkey = '11223344556677889900';
-			$sellerkeyver = '0';
+			$sellerkeyver = '1';
 		}
 
 		$hashFields = array_filter(array_keys($this->data), array('self', 'isHashField'));
@@ -209,7 +282,7 @@ class ControllerPaymentEmaksut extends Controller {
 		if($this->config->get('emaksut_test')=='1') {
 			$this->data['pmt_sellerid'] = 'testikauppias';
 			$sellerkey = '11223344556677889900';
-			$sellerkeyver = '0';
+			$sellerkeyver = '1';
 		}
 
 		$error = '';
